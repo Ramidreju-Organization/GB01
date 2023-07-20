@@ -13,7 +13,6 @@ const PORT = 3000;
 // const http = require('http').Server(app)
 const cors = require('cors');
 
-
 // app.use(cors)
 
 //WEBSOCKET SERVER
@@ -78,7 +77,7 @@ app.use('/api/authenticate', (req, res) => {
         .then((res) => res.json())
         .then((data) => {
           const userName = data.name;
-          res.cookie(`userName`, userName);
+          res.cookie(`userName`, userName, { maxAge: 30000 });
           return res.redirect('http://localhost:8080/login');
         })
         .catch((err) => {
