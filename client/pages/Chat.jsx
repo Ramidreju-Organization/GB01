@@ -1,40 +1,42 @@
 import React, { useEffect } from 'react';
-// import WebSocket from 'ws';
-import socketIO from 'socket.io-client'
-// const socket = socketIO.connect('http://localhost:3000')
+import '../stylesheets/Chat.scss';
 
 function Chat() {
+  let sock = new WebSocket('ws://localhost:5000');
+  sock.binaryType = 'blob';
 
   useEffect(() => {
-    
-    // const element = document.querySelector('#chat-box');
-    // socket.onmessage = (e) => {
-    //     e.data.text().then(data => 
-    //         element.innerHTML += data + '<br>'
-    //     )
-    // };
+    const element = document.querySelector('#chat-box');
+    sock.onmessage = (e) => {
+      e.data.text().then((data) => {
+        let parsedData = JSON.parse(data);
+        element.innerHTML += parsedData.message + '<br>';
 
-
-    // const socket = io('http://localhost:5000')
-    // socket.on('connect', () => { 
-    //   displayMessage('You were connected with id:', socket.id)
-    //  })
-
-    //  socket.emit('custom-event', {username: 'kevin',
-    // message: 'my message'})
+        // create new element
+        // add to div
+      });
+    };
   }, []);
 
   const onClick = () => {
-    let text = document.getElementById('text').value;
-    socket.send(JSON.stringify(text));
+    let body = {
+      username: localStorage.getItem('username') || 'Guest',
+      message: document.getElementById('text').value,
+    };
+
+    sock.send(JSON.stringify(body));
   };
 
   return (
-    <div className="chat-container-main">
-      <div id="chat-box"></div>
-      <input type="text" id="text" placeholder="Your message"></input>
-      <button onClick={onClick}>Submit</button>
-      
+    <div className="chat-div-body">
+      <div className="chat-container-main">
+        <div id="chat-box">
+
+          
+        </div>
+        <input type="text" id="text" placeholder="Your message"></input>
+        <button onClick={onClick}>Submit</button>
+      </div>
     </div>
   );
 }

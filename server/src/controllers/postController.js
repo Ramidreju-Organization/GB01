@@ -35,7 +35,6 @@ postController.retrievePosts = async (req, res, next) => {
   //SELECT * FROM posts INNER JOIN users ON posts.uploader = users.user_id WHERE tech = $1
   try {
     const arrOfComments = await db.query(lookupText);
-    console.log('Retrieved general comments: ', arrOfComments);
     res.locals.comments = arrOfComments;
     return next();
   } catch (err) {

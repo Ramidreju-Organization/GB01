@@ -49,7 +49,6 @@ const Login = (props) => {
 
   return (
     <div className="wrapper">
-      <Navbar />
       <div className="body2">
         {/* <a href={hrefString}>Click here</a> */}
         <div className="submit_button_box">
