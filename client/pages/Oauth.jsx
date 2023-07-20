@@ -4,11 +4,11 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 //add containers and requirements for JS
 import Navbar from '../components/Navbar.jsx';
 // import CLIENT_ID from '../../.env';
+import '../stylesheets/Oauth.scss';
 
 const Login = (props) => {
   useEffect(() => {
     // if (cookie exists) then redirect to home page
-    console.log(document.cookie);
     const cookieString = document.cookie;
     const cookieObj = {};
     let currentlyBuilding = 'cookieName';
@@ -35,12 +35,10 @@ const Login = (props) => {
         if (currentlyBuilding === 'cookieVal') cookieVal += currentChar;
       }
     }
-    console.log('cookieObj: ', cookieObj);
     if (cookieObj.userName) {
       localStorage.setItem('username', cookieObj.userName);
       window.location.href = 'http://localhost:8080';
-      alert('Successfully Logged In');
-    } else alert('Please log in');
+    }
   }, []);
 
   const handleLogin = (e) => {
@@ -53,13 +51,13 @@ const Login = (props) => {
         {/* <a href={hrefString}>Click here</a> */}
         <div className="submit_button_box">
           <button
-            className="form_submit_button"
+            className="oauthLoginButton"
             value="Submit"
             onClick={(e) => {
               handleLogin(e);
             }}
           >
-            Submit Login Credentials
+            Login with Github
           </button>
         </div>
       </div>

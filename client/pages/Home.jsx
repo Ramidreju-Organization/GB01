@@ -36,6 +36,26 @@ const Home = () => {
     }
   };
 
+ //EDIT a Tech API
+ const handleEdit = (e) => {};
+ //DELETE a Tech API
+ const handleDelete = async (e) => {
+   e.stopPropagation();
+   const tech_id = e.target.id;
+   try {
+    const response = await fetch ('/api/tech/' + tech_id, {
+      method: 'DELETE'
+    });
+    alert('You deleted a WHOLE TECH, hope your happy with yourself..');
+    fetchData();
+  } catch (err) {
+    return next({
+      log: 'error in Card delete: handleDelete',
+      message: 'error in the handleDelete'
+    });
+  }
+ };
+
   const renderBox = () => {
     return techCardState.map((item, index) => {
       return (
@@ -47,6 +67,7 @@ const Home = () => {
           image_url={item.image_url}
           link={item.link}
           loggedInState={loggedInState}
+          handleEdit={handleEdit}
           handleDelete={handleDelete}
         />
       );
@@ -86,15 +107,6 @@ const Home = () => {
       console.log(err);
     }
   };
-  //EDIT a Tech API
-  const handleEdit = (e) => {};
-  //DELETE a Tech API
-
-
-  const handleDelete = (e) => { 
-    e.stopPropagation();
-    console.log(3)
-   }
 
   return (
     <div className="home-body">

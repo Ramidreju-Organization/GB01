@@ -139,19 +139,20 @@ const Comments = () => {
     setEditorContent(content);
   };
 
-  const editComment = (e) => {};
+  const editComment = (e) => {
+
+  };
   const deleteComment = async (e) => {
     e.stopPropagation();
     //-->get the post id # so we can look it up for deletion
-    console.log('event to delete', e);
     const post_id = e.target.id;
     // const response = await fetch('/api/post/' + post_id, {
     //   method: 'DELETE',
     // });
     //return a delete statement
-    // console.log('response of delete', response);
-
-    // alert('You deleted a comment, hope your happy with yourself..');
+    alert('You deleted a comment, hope your happy with yourself..');
+    fetchData();
+    setActiveIndex(null)
   };
 
   return (
