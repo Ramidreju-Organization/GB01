@@ -25,29 +25,20 @@ function techCard(props) {
         <h3 href={props.link} className="topic-item-name">
           {props.name}
         </h3>
-        <p>{props.description}</p>
+        <div className="description-container">
+          <p>{props.description}</p>
+        </div>
+
         <div className="stats-container">
-          <a>Created By: Tyler</a>
           <a>Posts: 5</a>
         </div>
       </div>
-      <div className="buttons-container">
-        <button
-          onClick={
-            props.handleEdit
-          }
-        >
-          EDIT
-        </button>
-        <button
-          id={props.id}
-          onClick={
-            props.handleDelete
-          }
-        >
-          DELETE
-        </button>
-      </div>
+      {props.loggedInState && (
+        <div className="buttons-container">
+          {/* <button onClick={props.handleDelete}>EDIT</button> */}
+          <button onClick={props.handleDelete}>DELETE</button>
+        </div>
+      )}
     </div>
   );
 }

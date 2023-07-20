@@ -22,6 +22,7 @@ const Feed = () => {
   const [image, setImage] = useState();
 
   const [commentsData, setcommentsData] = useState([]);
+  const [loggedInState, setLoggedInState] = useState(false);
 
   //from here we had starting typing out the states to handle the backend format but realized we did not have enough time so it is not connected/finished
 
@@ -47,7 +48,7 @@ const Feed = () => {
   const [commentData, setcommentData] = useState([]);
 
   const handleAddCommentClick = async (e) => {
-    console.log("Comment Submit Event: ", e);
+    console.log('Comment Submit Event: ', e);
     e.preventDefault();
 
     const body = {
@@ -60,10 +61,9 @@ const Feed = () => {
       title: document.querySelector('#title').value,
       comment: document.querySelector('#comment').value,
       image: null,
-      
     };
 
-    console.log("Comment body tags:  ", body);
+    console.log('Comment body tags:  ', body);
     try {
       await fetch('/api/post', {
         method: 'POST',
@@ -76,15 +76,16 @@ const Feed = () => {
       console.log(err);
     }
 
-    fetchData()
-    setShowOverlay(false)
-
+    fetchData();
+    setShowOverlay(false);
   };
-
 
   // initializing the page
   useEffect(() => {
     //the tech id is linked to the home page box technology clicked
+    if (localStorage.getItem('username')) {
+      setLoggedInState(true);
+    }
     fetchData();
   }, []);
 
@@ -97,7 +98,7 @@ const Feed = () => {
         },
       });
       const data = await response.json();
-      console.log('data', data.rows)
+      console.log('data', data.rows);
 
       // newData =  {tech: tech-obj, posts: [post-obj, post-obj, ..]}
       // idk what this does
@@ -107,10 +108,7 @@ const Feed = () => {
       setTechLink(data.contact);
       setTechImage(data.image);
 
-
-
       setcommentData(data.rows);
-
 
       // console.log('New Data: ', newData);
 
@@ -121,10 +119,9 @@ const Feed = () => {
       }
       */
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   };
-
 
   const handleAccordionClick = (index) => {
     setActiveIndex(index === activeIndex ? null : index);
@@ -134,79 +131,98 @@ const Feed = () => {
     setEditorContent(content);
   };
 
+  const deleteComment = async (e) => {
+    //-->get the post id # so we can look it up for deletion
+    console.log('event to delete', e);
+    const post_id = e.target.id;
+    const response = await fetch('/api/post/' + post_id, {
+      method: 'DELETE',
+    });
+    //return a delete statement
+    console.log('response of delete', response);
+    alert('You deleted a comment, hope your happy with yourself..');
+  };
+
   return (
-    <div>
-      <div className="main-header">
-        <div>
-          <div className="content">
-            <div className="comment-data-box">
-              <img className="comment-data-image" src={techImage}></img>
-              <div>
-                <a href={techLink} className="comment-tech-link">
-                  <h2>{techName}</h2>
-                </a>
-                <p className="comment-tech-description">{techDescription}</p>
-              </div>
-            </div>
-            <button className="button" onClick={() => setShowOverlay(true)}>
-              + Add Comment
-            </button>
-            {showOverlay && (
-              <AddCommentPopup
-                handleAddCommentClick={handleAddCommentClick}
-                handleCancel={() => setShowOverlay(false)}
-              />
-            )}
-          </div>
-        </div>
-      </div>
+    <div className="main-body-comments">
+      <div className="main-container-comments">
+        <h1 className="main-title">All Comments</h1>
 
-      {/* <div className="input-container">
-        <input type="text" className="input-bar" placeholder="Search APIs..." />
-      </div> */}
-
-      <div className="accordion">
-        {commentData.map((item, index) => {
-          console.log(item)
-          return (
-            <div
-              key={index}
-              className={`accordion-item ${
-                index === activeIndex ? 'active' : ''
-              }`}
-            >
-              <div className="accordion-header-outer">
-                <div
-                  className="accordion-header"
-                  onClick={() => handleAccordionClick(index)}
-                >
-                  <div>{item.title}</div>
-                  <div className="details">
-                    <p className="username">{item.name}</p>
-                    {item.type_review && <p className="tags_review">Review</p>}
-                    {item.type_advice && <p className="tags_advice">Advice</p>}
-                    {item.type_code_snippet && <p className="tags_code_snippet">Code</p>}
-                    {item.type_help_offer && <p className="tags_help_offer">Help!</p>}
-                  </div>
-                </div>
-              </div>
-              {index === activeIndex && (
-                <div className="accordion-content">
-                  <div>
-                    <div className="experience">
-                      {HelperFunctions.md(item.comment)}
+        <div className="accordion">
+          {commentData.map((item, index) => {
+            return (
+              <div
+                key={index}
+                className={`accordion-item ${
+                  index === activeIndex ? 'active' : ''
+                }`}
+              >
+                <div className="accordion-header-outer">
+                  <div
+                    className="accordion-header"
+                    onClick={() => handleAccordionClick(index)}
+                  >
+                    <p className="comment-title">{item.title}</p>
+                    <div className="details">
+                      <p>Created by</p>
+                      <p className="username"> {item.name}</p>
+                      <div className="tags-container">
+                        Tags:
+                        {item.type_review && (
+                          <p className="tags-label">Review</p>
+                        )}
+                        {item.type_advice && (
+                          <p className="tags-label">Advice</p>
+                        )}
+                        {item.type_code_snippet && (
+                          <p className="tags-label">Code</p>
+                        )}
+                        {item.type_help_offer && (
+                          <p className="tags-label">Help!</p>
+                        )}
+                      </div>
+                      <div className="buttons-div">
+                        {/* <button
+                          className="edit_button"
+                          onClick={editComment}
+                          id={item.post_id}
+                        >
+                          EDIT
+                        </button> */}
+                        {loggedInState && (
+                          <button
+                            className="delete_button"
+                            onClick={deleteComment}
+                            id={item.post_id}
+                          >
+                            DELETE
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
-          );
-        })}
+                {index === activeIndex && (
+                  <div className="accordion-content">
+                    <div>
+                      <div className="experience">
+                        {HelperFunctions.md(item.comment)}
+                      </div>
+                      <img
+                        src={item.image}
+                        alt="Image"
+                        className="accordion-image"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 };
 
-
 export default Feed;
-

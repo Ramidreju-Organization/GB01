@@ -22,14 +22,17 @@ export default function Navbar() {
 
   return (
     <div className="Navbar">
+      
+           
       <div id="left">
-        <p onClick={chat} id="first">
-          CHAT
-        </p>
+      <img src="http://127.0.0.1:8080/goru-logo.png" height={100} onClick={home}></img>
       </div>
-      <img src="http://127.0.0.1:8080/goru-logo.png" height={100}></img>
+
 
       <div id="right">
+      <p onClick={chat} id="chat-label">
+          CHAT
+        </p>
         <p onClick={home}>HOME</p>
         <p onClick={Feed}>FEED</p>
         {localStorage.getItem('username') ? (

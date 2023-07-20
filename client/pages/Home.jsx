@@ -10,8 +10,14 @@ const Home = () => {
 
   const [techCardState, settechCardState] = useState([]);
 
+  const [loggedInState, setLoggedInState] = useState(false)
+
   // initializing the page
-  useEffect(() => {
+  useEffect(() => { 
+
+    if (localStorage.getItem('username')) {
+      setLoggedInState(true)
+    }
     fetchData();
   }, []);
 
@@ -60,6 +66,7 @@ const Home = () => {
           id={item.tech_id}
           image_url={item.image_url}
           link={item.link}
+          loggedInState={loggedInState}
           handleEdit={handleEdit}
           handleDelete={handleDelete}
         />
@@ -109,14 +116,17 @@ const Home = () => {
             overlayState={showOverlay}
             overlayOff={() => setShowOverlay(false)}
             handleAddTechSubmit={handleAddTechSubmit}
+            loggedInState={loggedInState}
+            
           />
         )}
 
         <div className="content-header">
           <h1>Tech Topics</h1>
-          <button className="button" onClick={() => setShowOverlay(true)}>
+
+        {(loggedInState) && (<button className="button" onClick={() => setShowOverlay(true)}>
             NEW TOPIC
-          </button>
+          </button>)}
         </div>
         <div className="topic-container">{renderBox()}</div>
       </div>

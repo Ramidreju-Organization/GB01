@@ -20,6 +20,7 @@ const Comments = () => {
   const [techImage, setTechImage] = useState('');
   const [entry, setEntry] = useState();
   const [image, setImage] = useState();
+  const [loggedInState, setLoggedInState] = useState(false);
 
   const [commentsData, setcommentsData] = useState([]);
 
@@ -84,6 +85,9 @@ const Comments = () => {
 
   // initializing the page
   useEffect(() => {
+    if (localStorage.getItem('username')) {
+      setLoggedInState(true);
+    }
     //the tech id is linked to the home page box technology clicked
     fetchData();
   }, []);
@@ -139,14 +143,13 @@ const Comments = () => {
 
   };
   const deleteComment = async (e) => {
+    e.stopPropagation();
     //-->get the post id # so we can look it up for deletion
-    console.log('event to delete', e);
     const post_id = e.target.id;
-    const response = await fetch('/api/post/' + post_id, {
-      method: 'DELETE',
-    });
+    // const response = await fetch('/api/post/' + post_id, {
+    //   method: 'DELETE',
+    // });
     //return a delete statement
-    console.log('response of delete', response.json());
     alert('You deleted a comment, hope your happy with yourself..');
     fetchData();
     setActiveIndex(null)
@@ -168,12 +171,15 @@ const Comments = () => {
               <p className="comment-tech-description">{techDescription}</p>
             </div>
           </div>
-          <button
-            className="new-comment-button"
-            onClick={() => setShowOverlay(true)}
-          >
-            NEW COMMENT
-          </button>
+          {loggedInState && (
+            <button
+              className="new-comment-button"
+              onClick={() => setShowOverlay(true)}
+            >
+              NEW COMMENT
+            </button>
+          )}
+
           {showOverlay && (
             <AddCommentPopup
               handleAddCommentClick={handleAddCommentClick}
@@ -202,7 +208,8 @@ const Comments = () => {
                   >
                     <p className="comment-title">{item.title}</p>
                     <div className="details">
-                      <p className="username">Created by {item.name}</p>
+                      <p>Created by</p>
+                      <p className="username"> {item.name}</p>
                       <div className="tags-container">
                         Tags:
                         {item.type_review && (
@@ -226,13 +233,16 @@ const Comments = () => {
                         >
                           EDIT
                         </button> */}
-                        <button
-                          className="delete_button"
-                          onClick={deleteComment}
-                          id={item.post_id}
-                        >
-                          DELETE
-                        </button>
+
+                        {loggedInState && (
+                          <button
+                            className="delete_button"
+                            onClick={deleteComment}
+                            id={item.post_id}
+                          >
+                            DELETE
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
