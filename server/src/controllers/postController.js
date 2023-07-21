@@ -23,7 +23,24 @@ postController.findPost = async (req, res, next) => {
   } catch (err) {
     return next({
       log: 'Encountered lookup error in postController.findPost',
-      message: { err: 'Lookup error.' },
+      message: { err: 'Lookup error findPost' },
+    });
+  }
+};
+
+postController.retrievePosts = async (req, res, next) => {
+  // Get a post with req.params.id == postId
+  // Attach to res.locals.postRequest;
+  const lookupText = 'SELECT * FROM posts INNER JOIN users ON posts.uploader = users.user_id';
+  //SELECT * FROM posts INNER JOIN users ON posts.uploader = users.user_id WHERE tech = $1
+  try {
+    const arrOfComments = await db.query(lookupText);
+    res.locals.comments = arrOfComments;
+    return next();
+  } catch (err) {
+    return next({
+      log: 'Encountered lookup error in postController.retrievePosts',
+      message: { err: 'Lookup error retrievePosts' },
     });
   }
 };
@@ -33,7 +50,7 @@ postController.makePost = async (req, res, next) => {
   // Get username from cookies/session
   //const { username } = req.cookies;
   // const uploader_id = req.cookies('SSID');
-  const uploader_id = 8;
+  const uploader_id = 1;
   // Get post from body
   const {
     tech_id,
@@ -49,10 +66,30 @@ postController.makePost = async (req, res, next) => {
   // retreive tech id, uploader id, and language id
   // code
 
+  /*
+    CREATE TABLE posts(
+        post_id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        tech INTEGER NOT NULL,
+        FOREIGN KEY(tech) REFERENCES techs(tech_id),
+        uploader INTEGER NOT NULL,
+        FOREIGN KEY(uploader) REFERENCES users(user_id),
+        type_review BOOLEAN,
+        type_advice BOOLEAN,
+        type_code_snippet BOOLEAN,
+        type_help_offer BOOLEAN,
+        language INTEGER NOT NULL,
+        FOREIGN KEY(language) REFERENCES languages (language_id),
+        comment VARCHAR(5000) NOT NULL,
+        image TEXT
+    )
+
+*/
+
   try {
     // Add the post to the DB
     db.query(
-      `INSERT INTO posts (title, tech, uploader, type_review, type_advice, type_code_snippet, type_help_offer, language, comment, image) 
+      `INSERT INTO posts (title, tech, uploader, type_review, type_advice, type_code_snippet, type_help_offer, language, comment, image)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
       [
         title,
@@ -74,17 +111,33 @@ postController.makePost = async (req, res, next) => {
   }
 };
 
-postController.editPost = (req, res, next) => {
+postController.editPost = async (req, res, next) => {
   // An authorized/authenticated user wants to edit the post saved to res.locals.postRequest.
   // Edit the post by database ID
+  const id = req.params.id;
+  console.log('id')
+
 
   next();
 };
 
-postController.deletePost = (req, res, next) => {
+postController.deletePost = async (req, res, next) => {
   // An authorized/authenticated user wants to delete their post (res.locals.postRequest)
   // Delete the post from the database by databaseId.
-  next();
+  console.log('DeletePost Req: ', req.params, req.query); //--> find id
+  const id = Number(req.params.id);
+  try {
+    const response = await db.query(`DELETE FROM posts WHERE post_id=${id} `);
+    //PARAMETERIZE ID when you get time for preventing injection to SQL
+    res.locals.deleted = response;
+    return next()
+  } catch (err) {
+    return next({
+      log: 'Error in Deletion postController.deletePost',
+      message: { err: 'error in postcontroller.deletePost function'}
+    });
+  }
+
 };
 
 postController.findPostsByUser = async (req, res, next) => {
@@ -102,7 +155,7 @@ postController.findPostsByUser = async (req, res, next) => {
   } catch (err) {
     return next({
       log: 'Encountered lookup error in postController.findPostsByUser',
-      message: { err: 'Lookup error.' },
+      message: { err: 'Lookup error findPostsByUser' },
     });
   }
 };
@@ -111,7 +164,7 @@ postController.findPostsByTech = async (req, res, next) => {
   // Get all post with req.params.id == techId
   // Attach to res.locals.postList;
   const techId = req.params.id;
-  const lookupText = 'SELECT * FROM posts WHERE tech = $1';
+  const lookupText = 'SELECT * FROM posts INNER JOIN users ON posts.uploader = users.user_id WHERE tech = $1';
   const lookupVals = [techId];
   try {
     const { rows } = await db.query(lookupText, lookupVals);
@@ -121,7 +174,7 @@ postController.findPostsByTech = async (req, res, next) => {
   } catch (err) {
     return next({
       log: 'Encountered lookup error in postController.findPostsByTech',
-      message: { err: 'Lookup error.' },
+      message: { err: 'Lookup error findPostsByTech' },
     });
   }
 };

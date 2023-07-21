@@ -1,38 +1,95 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar.jsx';
-import './Home.scss';
+import '../stylesheets/Home.scss';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import TechCard from '../components/TechCard.jsx';
+import AddTechPopup from '../components/AddTechPopup.jsx';
 
 const Home = () => {
   //overlay state for showing the form, set true to appear
   const [showOverlay, setShowOverlay] = useState(false);
- 
-  //state for the form inputs
-  const [apiName, setApiName] = useState('');
-  const [apiURL, setApiURL] = useState('');
-  const [apiDescription, setApiDescription] = useState('');
-  const [apiImageURL, setApiImageURL] = useState('');
-  const [apiData, setApiData] = useState([]);
 
-  const navigate = useNavigate();
-  
-  const openOverlay = () => {
-    setShowOverlay(true);
+  const [techCardState, settechCardState] = useState([]);
+
+  const [loggedInState, setLoggedInState] = useState(false)
+
+  // initializing the page
+  useEffect(() => { 
+
+    if (localStorage.getItem('username')) {
+      setLoggedInState(true)
+    }
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch('/api/tech', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      settechCardState(data);
+    } catch (err) {
+      console.log('err', err);
+    }
   };
 
-  const params = useParams();
-
-  function comments(e) {
-    const senderTechId = e.target.id;
-    const senderName = e.target.name;
-    navigate(`/comments/${senderTechId}`); // received as route.params
-    //
+ //EDIT a Tech API
+ const handleEdit = (e) => {};
+ //DELETE a Tech API
+ const handleDelete = async (e) => {
+   e.stopPropagation();
+   const tech_id = e.target.id;
+   console.log(tech_id)
+   try {
+    await fetch ('/api/tech/' + tech_id, {
+      method: 'DELETE'
+    });
+    alert('You deleted a WHOLE TECH, hope your happy with yourself..');
+    fetchData();
+  } catch (err) {
+    return next({
+      log: 'error in Card delete: handleDelete',
+      message: 'error in the handleDelete'
+    });
   }
+ };
 
-  const addAPI = async () => {
-    console.log('addAPI inside');
-    event.preventDefault();
+  const renderBox = () => {
+    return techCardState.map((item, index) => {
+      return (
+        <TechCard
+          key={index}
+          name={item.name}
+          description={item.description}
+          id={item.tech_id}
+          image_url={item.image_url}
+          link={item.link}
+          loggedInState={loggedInState}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+        />
+      );
+    });
+  };
+  //ADD a NEW Tech API
+  const handleAddTechSubmit = async (e) => {
+    e.preventDefault();
+
+    const body = {
+      name: e.target.name.value,
+      link: e.target.link.value ? e.target.link.value : '',
+      image: e.target.image.value
+        ? e.target.image.value
+        : 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Ferret_icon_%28flipped%29_%28The_Noun_Project%29.svg/1200px-Ferret_icon_%28flipped%29_%28The_Noun_Project%29.svg.png',
+      typeApi: false,
+      typeFramework: false,
+      typeLibrary: false,
+      description: e.target.description.value ?  e.target.description.value : '',
+      keywords: ['maps'],
+    };
 
     try {
       setShowOverlay(false);
@@ -42,227 +99,69 @@ const Home = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: apiName,
-          link: apiURL,
-          image: apiImageURL,
-          typeApi: false,
-          typeFramework: false,
-          typeLibrary: false,
-          description: apiDescription,
-          keywords: ['maps'],
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
-      console.log('success');
-      console.log('data returned', data);
+      fetchData();
     } catch (err) {
       console.log(err);
     }
   };
 
-  // initializing the page
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/tech', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const data = await response.json();
-        const newData = JSON.parse(JSON.stringify(data));
-        setApiData(newData);
-      } catch (err) {}
-    };
-    fetchData();
-  }, []);
-
-  const renderBox = () => {
-    return apiData.map((item, index) => {
-      console.log(item);
-
-      return (
-        <div className="box" key={index}>
-          <div className="image-container">
-            <img src={item.image_url} alt="Tech" className="api-image" />
-          </div>
-          <div className="api-content">
-            <a href={item.link} className="tech-item-name">
-              {item.name}
-            </a>
-            <p>{item.description}</p>
-            <div className="button-comment">
-              <button onClick={comments} id={item.tech_id}>
-                Posts
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    });
-  };
-
   return (
-    <div>
-      <Navbar />
+    <div className="home-body">
+      <div className="main-container">
+        {showOverlay && (
+          <AddTechPopup
+            overlayState={showOverlay}
+            overlayOff={() => setShowOverlay(false)}
+            handleAddTechSubmit={handleAddTechSubmit}
+            loggedInState={loggedInState}
+            
+          />
+        )}
 
-      <div className="main-header">
-        <div>
-          <div className="content">
-            <div className="home-top-all-content">
-              <div className="home-top-title-button">
-                <h2>Cohort: CTRI 17</h2>
-                <div>
-                  <img src="./logo.png"></img>
-                </div>
-                <div>
-                  <button className="button" onClick={openOverlay}>
-                    + ADD TECH
-                  </button>
-                </div>
-              </div>
-              <div className="input-container">
-                <input
-                  type="text"
-                  className="input-bar-home"
-                  placeholder="Search APIs..."
-                />
-              </div>
-            </div>
-            {showOverlay && (
-              <div className="overlay">
-                <div className="overlay-content">
-                  <div>
-                    <form>
-                      <div className="formGroup">
-                        <h2>Add Tech</h2>
-                        <input
-                          type="text"
-                          className="input-one"
-                          placeholder="Add API Name"
-                          value={apiName}
-                          onChange={(event) => {
-                            setApiName(event.target.value);
-                          }}
-                        />
+        <div className="content-header">
+          <h1>Tech Topics</h1>
 
-                        <input
-                          type="text"
-                          className="input-one"
-                          placeholder="Add API URL"
-                          value={apiURL}
-                          onChange={(event) => {
-                            setApiURL(event.target.value);
-                          }}
-                        />
-                        <textarea
-                          className="input-one"
-                          rows="3"
-                          maxLength="150"
-                          placeholder="Add Brief Description"
-                          value={apiDescription}
-                          onChange={(event) => {
-                            setApiDescription(event.target.value);
-                          }}
-                        />
-                        <input
-                          type="text"
-                          className="input-one"
-                          placeholder="Add Image URL"
-                          value={apiImageURL}
-                          onChange={(event) => {
-                            setApiImageURL(event.target.value);
-                          }}
-                        />
-                        <input
-                          type="file"
-                          className="input-one"
-                          accept="image/*"
-                        />
-                      </div>
-
-                      <div className="btn">
-                        <button className="login-button" onClick={addAPI}>
-                          Submit!
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+        {(loggedInState) && (<button className="button" onClick={() => setShowOverlay(true)}>
+            NEW TOPIC
+          </button>)}
         </div>
-      </div>
-      <div className="one">
-        <div className="scroll-container">
-          <div className="grid-container">{renderBox()}</div>
-        </div>
+        <div className="topic-container">{renderBox()}</div>
       </div>
     </div>
+    //     <div className="main-header">
+    //       <div>
+    //         <div className="content">
+    //           <div className="home-top-all-content">
+    //             <div className="home-top-title-button">
+    //               <h2>Cohort: CTRI 17</h2>
+    //               <div>
+
+    //               </div>
+    //               <div></div>
+    //             </div>
+    //             {/* <div className="input-container">
+    //               <input
+    //                 type="text"
+    //                 className="input-bar-home"
+    //                 placeholder="Search APIs..."
+    //               />
+    //             </div> */}
+    //           </div>
+
+    //         </div>
+    //       </div>
+    //     </div>
+    //     <div className="main-container">
+    //       <div className="title-button-container"></div>
+
+    //     </div>
+    //   </div>
+    // );
   );
 };
 
 export default Home;
-
-// const mockData = [
-//   {
-//     header: 'Google Maps API',
-//     link: 'https://developers.google.com/maps/documentation/javascript/overview',
-//     paragraph:
-//       'Google Maps API allows you to embed maps into your website or application and customize them to fit your needs.',
-//     image: 'https://i.ibb.co/jzvCsB1/Screenshot-2023-07-16-at-3-17-57-PM.png',
-//   },
-//   {
-//     header: 'Google Maps API',
-//     link: 'https://developers.google.com/maps/documentation/javascript/overview',
-//     paragraph:
-//       'Google Maps API allows you to embed maps into your website or application and customize them to fit your needs.',
-//     image: 'https://i.ibb.co/jzvCsB1/Screenshot-2023-07-16-at-3-17-57-PM.png',
-//   },
-//   {
-//     header: 'Google Maps API',
-//     link: 'https://developers.google.com/maps/documentation/javascript/overview',
-//     paragraph:
-//       'Google Maps API allows you to embed maps into your website or application and customize them to fit your needs.',
-//     image: 'https://i.ibb.co/jzvCsB1/Screenshot-2023-07-16-at-3-17-57-PM.png',
-//   },
-//   {
-//     header: 'Google Maps API',
-//     link: 'https://developers.google.com/maps/documentation/javascript/overview',
-//     paragraph:
-//       'Google Maps API allows you to embed maps into your website or application and customize them to fit your needs.',
-//     image: 'https://i.ibb.co/jzvCsB1/Screenshot-2023-07-16-at-3-17-57-PM.png',
-//   },
-//   {
-//     header: 'Google Maps API',
-//     link: 'https://developers.google.com/maps/documentation/javascript/overview',
-//     paragraph:
-//       'Google Maps API allows you to embed maps into your website or application and customize them to fit your needs.',
-//     image: 'https://i.ibb.co/jzvCsB1/Screenshot-2023-07-16-at-3-17-57-PM.png',
-//   },
-//   {
-//     header: 'Google Maps API',
-//     link: 'https://developers.google.com/maps/documentation/javascript/overview',
-//     paragraph:
-//       'Google Maps API allows you to embed maps into your website or application and customize them to fit your needs.',
-//     image: 'https://i.ibb.co/jzvCsB1/Screenshot-2023-07-16-at-3-17-57-PM.png',
-//   },
-//   {
-//     header: 'Google Maps API',
-//     link: 'https://developers.google.com/maps/documentation/javascript/overview',
-//     paragraph:
-//       'Google Maps API allows you to embed maps into your website or application and customize them to fit your needs.',
-//     image: 'https://i.ibb.co/jzvCsB1/Screenshot-2023-07-16-at-3-17-57-PM.png',
-//   },
-//   {
-//     header: 'Google Maps API',
-//     link: 'https://developers.google.com/maps/documentation/javascript/overview',
-//     paragraph:
-//       'Google Maps API allows you to embed maps into your website or application and customize them to fit your needs.',
-//     image: 'https://i.ibb.co/jzvCsB1/Screenshot-2023-07-16-at-3-17-57-PM.png',
-//   },
-// ];

@@ -1,0 +1,74 @@
+.body {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 15% auto;
+  gap: 10px;
+  margin: 10px;
+  padding: 10px;
+  border: 2px black solid;
+  width: 90%;
+  height: 90%;
+  min-height: 500px;
+  min-width: 90%;
+}
+
+.profile_image {
+  border: 2px navy solid;
+  width: 80px;
+}
+
+.profile_text {
+  border: 2px navy solid;
+}
+
+.profile_pass {
+  border: 2px navy solid;
+}
+
+.profile_friends_list {
+  border: 2px olive solid;
+}
+
+.profile_comments_list {
+  border: 2px olive solid;
+}
+
+.profile_APIs_list {
+  border: 2px olive solid;
+}
+
+#profileContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#profileTitle {
+  font-weight: bold;
+  margin-top: 0.5em;
+  font-size: 30px;
+}
+
+#profileGreeting {
+  margin-top: 2em;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+#logoutButton {
+  background-color: #5c4ac0;
+  color: #fff;
+  height: 50px;
+  width: 140px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 10px 20px;
+  margin-top: 5em;
+}
+
+#logoutButton:hover {
+  background-color: #000000;
+}

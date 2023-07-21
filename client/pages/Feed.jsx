@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { useParams } from 'react-router-dom';
 import '../stylesheets/Comments.scss';
 import HelperFunctions from '../helper-functions';
 import AddCommentPopup from '../components/AddCommentPopup.jsx';
 
-const Comments = () => {
+const Feed = () => {
   //this is the state for the accordian, when the accordian is clicked it invokes an active index
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -20,9 +20,9 @@ const Comments = () => {
   const [techImage, setTechImage] = useState('');
   const [entry, setEntry] = useState();
   const [image, setImage] = useState();
-  const [loggedInState, setLoggedInState] = useState(false);
 
   const [commentsData, setcommentsData] = useState([]);
+  const [loggedInState, setLoggedInState] = useState(false);
 
   //from here we had starting typing out the states to handle the backend format but realized we did not have enough time so it is not connected/finished
 
@@ -80,42 +80,37 @@ const Comments = () => {
     setShowOverlay(false);
   };
 
-  //to find id of our url
-  const { id } = useParams();
-
   // initializing the page
   useEffect(() => {
+    //the tech id is linked to the home page box technology clicked
     if (localStorage.getItem('username')) {
       setLoggedInState(true);
     }
-    //the tech id is linked to the home page box technology clicked
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const techId = id;
-
     try {
-      const response = await fetch('/api/tech/' + techId, {
+      const response = await fetch('/api/post/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
       const data = await response.json();
+      console.log('data', data.rows);
 
-      const newData = JSON.parse(JSON.stringify(data));
       // newData =  {tech: tech-obj, posts: [post-obj, post-obj, ..]}
       // idk what this does
-      setCurrentTech(newData.tech);
-      setTechName(newData.tech.name);
-      setTechDescription(newData.tech.description);
-      setTechLink(newData.tech.link);
-      setTechImage(newData.tech.image_url);
+      setCurrentTech(data.tech);
+      setTechName(data.name);
+      setTechDescription(data.comment);
+      setTechLink(data.contact);
+      setTechImage(data.image);
 
-      setcommentData(data.posts);
+      setcommentData(data.rows);
 
-      console.log('New Data: ', newData);
+      // console.log('New Data: ', newData);
 
       /*
       commentData = {
@@ -123,12 +118,9 @@ const Comments = () => {
         tech: {tech: 2}
       }
       */
-    } catch (err) {}
-  };
-
-  const openOverlay = (e) => {
-    // e.preventDefault();
-    setShowOverlay(true);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleAccordionClick = (index) => {
@@ -139,58 +131,21 @@ const Comments = () => {
     setEditorContent(content);
   };
 
-  const editComment = (e) => {
-
-  };
   const deleteComment = async (e) => {
-    e.stopPropagation();
     //-->get the post id # so we can look it up for deletion
+    e.stopPropagation();
     const post_id = e.target.id;
-    const response = await fetch('/api/post/' + post_id, {
+    await fetch('/api/post/' + post_id, {
       method: 'DELETE',
     });
     //return a delete statement
-    alert('You deleted a comment, hope your happy with yourself..');
     fetchData();
-    setActiveIndex(null)
   };
 
   return (
     <div className="main-body-comments">
       <div className="main-container-comments">
-        <div className="main-header">
-          <div className="comment-data-box">
-            <img
-              className="comment-data-image"
-              src={techImage}
-              width={80}
-              height={80}
-            ></img>
-            <div className="comment-data-box-text">
-              <h2>{techName}</h2>
-              <p className="comment-tech-description">{techDescription}</p>
-            </div>
-          </div>
-          {loggedInState && (
-            <button
-              className="new-comment-button"
-              onClick={() => setShowOverlay(true)}
-            >
-              NEW COMMENT
-            </button>
-          )}
-
-          {showOverlay && (
-            <AddCommentPopup
-              handleAddCommentClick={handleAddCommentClick}
-              handleCancel={() => setShowOverlay(false)}
-            />
-          )}
-        </div>
-
-        {/* <div className="input-container">
-        <input type="text" className="input-bar" placeholder="Search APIs..." />
-      </div> */}
+        <h1 className="main-title">All Comments</h1>
 
         <div className="accordion">
           {commentData.map((item, index) => {
@@ -233,7 +188,6 @@ const Comments = () => {
                         >
                           EDIT
                         </button> */}
-
                         {loggedInState && (
                           <button
                             className="delete_button"
@@ -270,33 +224,4 @@ const Comments = () => {
   );
 };
 
-export default Comments;
-
-//this was our mock data before working with the database
-
-// const data = [
-//   {
-//     username: "bob",
-//     title: "Creating a project using Music Match Lyrics",
-//     languageUsed: "JavaScript",
-//     datePosted: Date.now(),
-//     experience: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sagittis sem nec metus dapibus feugiat. In hac habitasse platea dictumst. Nulla facilisi. Maecenas id ligula ligula. Nulla viverra facilisis neque, ut gravida neque lobortis non. Morbi sodales odio in tortor finibus, at tempor odio lobortis. In sed lacus vel elit vestibulum semper vitae sed nisl. Mauris tristique libero non sem vestibulum dignissim. Praesent varius venenatis felis, sed feugiat lectus vestibulum vitae. Donec eleifend sollicitudin facilisis. Ut viverra lectus non facilisis fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sagittis sem nec metus dapibus feugiat. In hac habitasse platea dictumst. Nulla facilisi. Maecenas id ligula ligula. Nulla viverra facilisis neque, ut gravida neque lobortis non. Morbi sodales odio in tortor finibus, at tempor odio lobortis. In sed lacus vel elit vestibulum semper vitae sed nisl. Mauris tristique libero non sem vestibulum dignissim. Praesent varius venenatis felis, sed feugiat lectus vestibulum vitae. Donec eleifend sollicitudin facilisis. Ut viverra lectus non facilisis fringilla.",
-//     image: "https://i.ibb.co/K5YV4Yx/Screenshot-2023-07-16-at-5-23-39-PM.png"
-//   },
-//   {
-//     username: "bob",
-//     title: "Creating a project using Music Match Lyrics",
-//     languageUsed: "JavaScript",
-//     datePosted: Date.now(),
-//     experience: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sagittis sem nec metus dapibus feugiat. In hac habitasse platea dictumst. Nulla facilisi. Maecenas id ligula ligula. Nulla viverra facilisis neque, ut gravida neque lobortis non. Morbi sodales odio in tortor finibus, at tempor odio lobortis. In sed lacus vel elit vestibulum semper vitae sed nisl. Mauris tristique libero non sem vestibulum dignissim. Praesent varius venenatis felis, sed feugiat lectus vestibulum vitae. Donec eleifend sollicitudin facilisis. Ut viverra lectus non facilisis fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sagittis sem nec metus dapibus feugiat. In hac habitasse platea dictumst. Nulla facilisi. Maecenas id ligula ligula. Nulla viverra facilisis neque, ut gravida neque lobortis non. Morbi sodales odio in tortor finibus, at tempor odio lobortis. In sed lacus vel elit vestibulum semper vitae sed nisl. Mauris tristique libero non sem vestibulum dignissim. Praesent varius venenatis felis, sed feugiat lectus vestibulum vitae. Donec eleifend sollicitudin facilisis. Ut viverra lectus non facilisis fringilla.",
-//     image: "https://i.ibb.co/K5YV4Yx/Screenshot-2023-07-16-at-5-23-39-PM.png"
-//   },
-//   {
-//     username: "bob",
-//     title: "Creating a project using Music Match Lyrics",
-//     languageUsed: "JavaScript",
-//     datePosted: Date.now(),
-//     experience: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sagittis sem nec metus dapibus feugiat. In hac habitasse platea dictumst. Nulla facilisi. Maecenas id ligula ligula. Nulla viverra facilisis neque, ut gravida neque lobortis non. Morbi sodales odio in tortor finibus, at tempor odio lobortis. In sed lacus vel elit vestibulum semper vitae sed nisl. Mauris tristique libero non sem vestibulum dignissim. Praesent varius venenatis felis, sed feugiat lectus vestibulum vitae. Donec eleifend sollicitudin facilisis. Ut viverra lectus non facilisis fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sagittis sem nec metus dapibus feugiat. In hac habitasse platea dictumst. Nulla facilisi. Maecenas id ligula ligula. Nulla viverra facilisis neque, ut gravida neque lobortis non. Morbi sodales odio in tortor finibus, at tempor odio lobortis. In sed lacus vel elit vestibulum semper vitae sed nisl. Mauris tristique libero non sem vestibulum dignissim. Praesent varius venenatis felis, sed feugiat lectus vestibulum vitae. Donec eleifend sollicitudin facilisis. Ut viverra lectus non facilisis fringilla.",
-//     image: "https://i.ibb.co/K5YV4Yx/Screenshot-2023-07-16-at-5-23-39-PM.png"
-//   },
-// ];
+export default Feed;

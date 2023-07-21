@@ -54,4 +54,16 @@ router.get(
   }
 );
 
+router.put(
+  '/:id',
+
+)
+
+router.delete(
+  '/:id', techController.deleteTech, (req, res) => {
+    res.status(200).json(res.locals.deleted);
+  }
+
+)
+
 module.exports = router;
