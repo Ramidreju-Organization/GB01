@@ -50,7 +50,7 @@ postController.makePost = async (req, res, next) => {
   // Get username from cookies/session
   //const { username } = req.cookies;
   // const uploader_id = req.cookies('SSID');
-  const uploader_id = 2;
+  const uploader_id = 1;
   // Get post from body
   const {
     tech_id,

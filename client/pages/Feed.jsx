@@ -133,14 +133,13 @@ const Feed = () => {
 
   const deleteComment = async (e) => {
     //-->get the post id # so we can look it up for deletion
-    console.log('event to delete', e);
+    e.stopPropagation();
     const post_id = e.target.id;
-    const response = await fetch('/api/post/' + post_id, {
+    await fetch('/api/post/' + post_id, {
       method: 'DELETE',
     });
     //return a delete statement
-    console.log('response of delete', response);
-    alert('You deleted a comment, hope your happy with yourself..');
+    fetchData();
   };
 
   return (
