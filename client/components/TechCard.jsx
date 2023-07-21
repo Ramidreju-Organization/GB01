@@ -36,7 +36,8 @@ function techCard(props) {
       {props.loggedInState && (
         <div className="buttons-container">
           {/* <button onClick={props.handleDelete}>EDIT</button> */}
-          <button onClick={props.handleDelete}>DELETE</button>
+          <button onClick={props.handleDelete}
+          id={props.id}>DELETE</button>
         </div>
       )}
     </div>

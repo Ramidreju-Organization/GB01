@@ -42,8 +42,9 @@ const Home = () => {
  const handleDelete = async (e) => {
    e.stopPropagation();
    const tech_id = e.target.id;
+   console.log(tech_id)
    try {
-    const response = await fetch ('/api/tech/' + tech_id, {
+    await fetch ('/api/tech/' + tech_id, {
       method: 'DELETE'
     });
     alert('You deleted a WHOLE TECH, hope your happy with yourself..');
@@ -79,14 +80,14 @@ const Home = () => {
 
     const body = {
       name: e.target.name.value,
-      link: e.target.link.value,
+      link: e.target.link.value ? e.target.link.value : '',
       image: e.target.image.value
         ? e.target.image.value
         : 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Ferret_icon_%28flipped%29_%28The_Noun_Project%29.svg/1200px-Ferret_icon_%28flipped%29_%28The_Noun_Project%29.svg.png',
       typeApi: false,
       typeFramework: false,
       typeLibrary: false,
-      description: e.target.description.value,
+      description: e.target.description.value ?  e.target.description.value : '',
       keywords: ['maps'],
     };
 

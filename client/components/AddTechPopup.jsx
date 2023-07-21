@@ -13,28 +13,28 @@ function AddTechPopup(props) {
             <h2>Add Tech</h2>
             <input
               type="text"
-              className="input-one"
+              className="overlayName"
               placeholder="Add Tech Name"
-              id="overlayName"
+              id='name'
             />
 
             <input
               type="text"
-              className="input-one"
+              className="overlayLink"
               placeholder="Add Tech URL"
-              id="overlayLink"
+              id="link"
             />
             <input
               type="text"
-              className="input-one"
+              className="overlayDescription"
               placeholder="Add Brief Description"
-              id="overlayDescription"
+              id="description"
             />
             <input
               type="text"
               placeholder="add image url(optional)"
-              id="overlayImage"
-              className="input-one"
+              id="image"
+              className="overlayImage"
             />
             <div id="overlayButtonContainer" className="input-one">
               <input id="overlaySubmitButton" type="submit" value="Submit" />

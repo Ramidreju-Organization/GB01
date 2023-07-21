@@ -26,9 +26,7 @@ const Profile = (props) => {
 
   return (
     <div id="profileContainer">
-      <h1 id="profileTitle">
-        {localStorage.getItem('username')}'s Profile Page
-      </h1>
+      <h1 id="profileTitle">Hello, {localStorage.getItem('username')}</h1>
       {/* <p id="profileGreeting">Hello {localStorage.getItem('username')}!</p> */}
       <button id="logoutButton" onClick={handleLogOutUser}>
         Log Out

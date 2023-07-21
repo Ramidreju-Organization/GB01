@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import '../stylesheets/Chat.scss';
-import ChatMessage from '../components/ChatMessage';
 
 function Chat() {
   let sock = new WebSocket('ws://localhost:5000');
@@ -16,7 +15,7 @@ function Chat() {
         let parsedData = JSON.parse(data);
 
         element.innerHTML +=
-          parsedData.username + ' : ' + parsedData.message + '<br>';
+          parsedData.username + ': ' + parsedData.message + '<br>'
 
         // stateHelper(parsedData)
 
@@ -30,10 +29,10 @@ function Chat() {
     };
   }, []);
 
-  const stateHelper = (obj) => {
-    console.log(obj);
-    setMessageState([...messageState].push(obj));
-  };
+  // const stateHelper = (obj) => {
+  //   console.log(obj);
+  //   setMessageState([...messageState].push(obj));
+  // };
 
   const onClick = (e) => {
     e.preventDefault()
@@ -43,6 +42,8 @@ function Chat() {
     };
 
     sock.send(JSON.stringify(body));
+
+    document.getElementById('text').value = '';
   };
 
   return (
@@ -56,8 +57,8 @@ function Chat() {
           />;
         })} */}
         <form onSubmit={onClick}>
-          <input type="text" id="text" placeholder="Your message"></input>
-          <input type='submit'></input>
+          <input type="text" id="text" placeholder='Type a message here...'></input>
+          {/* <input type='submit'></input> */}
         </form>
       </div>
     </div>
